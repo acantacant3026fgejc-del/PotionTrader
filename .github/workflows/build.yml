@@ -1,1 +1,36 @@
+name: Build PotionTrader
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download tModLoader
+        run: |
+          curl -L --fail --retry 3 -o tModLoader.zip https://github.com/tModLoader/tModLoader/releases/download/v2026.01.2.1/tModLoader.zip
+          mkdir tml
+          unzip -q tModLoader.zip -d tml
+
+      - name: Build mod
+        working-directory: tml
+        run: dotnet tModLoader.dll -server -build "$GITHUB_WORKSPACE"
+
+      - name: Upload mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: PotionTrader
+          path: tml/Mods/*.tmod
+          if-no-files-found: error
