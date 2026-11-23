@@ -1,0 +1,1 @@
+Potion Trader adds a new NPC who sells potions.
